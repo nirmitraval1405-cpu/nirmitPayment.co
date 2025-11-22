@@ -814,9 +814,10 @@
     const API_BASE = '/api';
 
     async function apiRequest(path, options = {}) {
+      const { headers: customHeaders, ...restOptions } = options;
       const response = await fetch(`${API_BASE}${path}`, {
-        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-        ...options
+        ...restOptions,
+        headers: { 'Content-Type': 'application/json', ...(customHeaders || {}) }
       });
       if (!response.ok) {
         const message = await response.text();
