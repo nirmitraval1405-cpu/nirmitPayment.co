@@ -1,0 +1,1573 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Manager</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f172a;
+      min-height: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    .container {
+      display: flex;
+      height: 100%;
+      min-height: 100%;
+    }
+
+    .sidebar {
+      width: 260px;
+      background: #1e293b;
+      box-shadow: 2px 0 20px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+      border-right: 1px solid #334155;
+    }
+
+    .logo {
+      padding: 30px 25px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .logo h1 {
+      font-size: 24px;
+      color: #10b981;
+      font-weight: 700;
+    }
+
+    .nav-menu {
+      flex: 1;
+      padding: 20px 0;
+    }
+
+    .nav-item {
+      padding: 14px 25px;
+      cursor: pointer;
+      color: #94a3b8;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-item:hover {
+      background: #334155;
+      color: #10b981;
+    }
+
+    .nav-item.active {
+      background: #334155;
+      color: #10b981;
+      border-left: 3px solid #10b981;
+    }
+
+    .nav-icon {
+      font-size: 20px;
+    }
+
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      padding: 30px;
+      overflow-y: auto;
+      height: 100%;
+    }
+
+    .header {
+      background: #1e293b;
+      padding: 28px 35px;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #334155;
+    }
+
+    .header h2 {
+      font-size: 28px;
+      color: #e2e8f0;
+      font-weight: 700;
+    }
+
+    .btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-primary {
+      background: #7c3aed;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #6d28d9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.5);
+    }
+
+    .btn-secondary {
+      background: #334155;
+      color: #94a3b8;
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: #1e293b;
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      border: 1px solid #334155;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      transform: translateY(-2px);
+      border-color: #475569;
+    }
+
+    .stat-label {
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .stat-card.income .stat-value {
+      color: #10b981;
+    }
+
+    .stat-card.expense .stat-value {
+      color: #ef4444;
+    }
+
+    .stat-card.profit .stat-value {
+      color: #7c3aed;
+    }
+
+    .content-card {
+      background: #1e293b;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+      border: 1px solid #334155;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background: #0f172a;
+      padding: 14px;
+      text-align: left;
+      font-weight: 600;
+      color: #94a3b8;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 16px 14px;
+      border-bottom: 1px solid #334155;
+      color: #cbd5e1;
+    }
+
+    tr:hover {
+      background: #334155;
+    }
+
+    .badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .badge.paid {
+      background: #10b981;
+      color: #ffffff;
+      border: 1px solid #059669;
+    }
+
+    .badge.pending {
+      background: #f59e0b;
+      color: #ffffff;
+      border: 1px solid #d97706;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #1e293b;
+      padding: 35px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90%;
+      overflow-y: auto;
+      border: 1px solid #334155;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .modal-header h3 {
+      font-size: 22px;
+      color: #e2e8f0;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      font-size: 28px;
+      color: #9ca3af;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-btn:hover {
+      color: #4b5563;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 30px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #64748b;
+    }
+
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      background: #334155;
+      color: #cbd5e1;
+    }
+
+    .icon-btn:hover {
+      background: #475569;
+    }
+
+    .icon-btn.edit:hover {
+      background: #7c3aed;
+      color: #ffffff;
+    }
+
+    .icon-btn.delete:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .search-box {
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px 16px;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.3);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-top: 20px;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: #94a3b8;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 200px;
+      }
+
+      .main-content {
+        margin-left: 200px;
+        padding: 20px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      th, td {
+        padding: 10px 8px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .container {
+        flex-direction: column;
+      }
+
+      .nav-item {
+        padding: 12px 20px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container"><!-- Sidebar -->
+   <div class="sidebar">
+    <div class="logo">
+     <h1 id="appTitle">💰 Finance Manager</h1>
+    </div>
+    <nav class="nav-menu">
+     <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📊</span> <span>Dashboard</span>
+     </div>
+     <div class="nav-item" data-page="clients"><span class="nav-icon">👥</span> <span>Clients</span>
+     </div>
+     <div class="nav-item" data-page="payments"><span class="nav-icon">💳</span> <span>Payments</span>
+     </div>
+     <div class="nav-item" data-page="expenses"><span class="nav-icon">💸</span> <span>Expenses</span>
+     </div>
+     <div class="nav-item" data-page="reports"><span class="nav-icon">📈</span> <span>Reports</span>
+     </div>
+    </nav>
+   </div><!-- Main Content -->
+   <main class="main-content"><!-- Dashboard Page -->
+    <div id="dashboardPage" class="page">
+     <div class="header">
+      <h2>Dashboard</h2>
+     </div>
+     <div class="stats-grid">
+      <div class="stat-card income">
+       <div class="stat-label">
+        Total Income
+       </div>
+       <div class="stat-value" id="totalIncome">
+        $0
+       </div>
+      </div>
+      <div class="stat-card expense">
+       <div class="stat-label">
+        Total Expenses
+       </div>
+       <div class="stat-value" id="totalExpenses">
+        $0
+       </div>
+      </div>
+      <div class="stat-card profit">
+       <div class="stat-label">
+        Net Profit
+       </div>
+       <div class="stat-value" id="netProfit">
+        $0
+       </div>
+      </div>
+      <div class="stat-card">
+       <div class="stat-label">
+        Total Clients
+       </div>
+       <div class="stat-value" id="totalClients">
+        0
+       </div>
+      </div>
+     </div>
+     <div class="content-card">
+      <h3 style="margin-bottom: 10px; color: #e2e8f0; font-size: 18px;">Monthly Income Trend</h3>
+      <div class="chart-container">
+       <canvas id="incomeChart"></canvas>
+      </div>
+     </div>
+     <div class="content-card">
+      <h3 style="margin-bottom: 10px; color: #e2e8f0; font-size: 18px;">Recent Payments</h3>
+      <div class="table-container">
+       <table>
+        <thead>
+         <tr>
+          <th>Client</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Status</th>
+         </tr>
+        </thead>
+        <tbody id="recentPaymentsTable">
+         <tr>
+          <td colspan="4" class="empty-state">No payments yet</td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Clients Page -->
+    <div id="clientsPage" class="page" style="display: none;">
+     <div class="header">
+      <h2>Clients</h2><button class="btn btn-primary" id="addClientBtn">+ Add Client</button>
+     </div>
+     <div class="content-card">
+      <div class="search-box"><input type="text" id="clientSearch" placeholder="🔍 Search clients...">
+      </div>
+      <div class="loading" id="clientsLoading">
+       Loading clients...
+      </div>
+      <div class="table-container">
+       <table>
+        <thead>
+         <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Service</th>
+          <th>Actions</th>
+         </tr>
+        </thead>
+        <tbody id="clientsTable">
+         <tr>
+          <td colspan="5">
+           <div class="empty-state">
+            <div class="empty-state-icon">
+             👥
+            </div>
+            <p>No clients yet</p><button class="btn btn-primary" onclick="document.getElementById('addClientBtn').click()">Add Your First Client</button>
+           </div></td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Payments Page -->
+    <div id="paymentsPage" class="page" style="display: none;">
+     <div class="header">
+      <h2>Payments</h2><button class="btn btn-primary" id="addPaymentBtn">+ Add Payment</button>
+     </div>
+     <div class="content-card">
+      <div class="search-box"><input type="text" id="paymentSearch" placeholder="🔍 Search payments...">
+      </div>
+      <div class="loading" id="paymentsLoading">
+       Loading payments...
+      </div>
+      <div class="table-container">
+       <table>
+        <thead>
+         <tr>
+          <th>Client</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Mode</th>
+          <th>Status</th>
+          <th>Actions</th>
+         </tr>
+        </thead>
+        <tbody id="paymentsTable">
+         <tr>
+          <td colspan="6">
+           <div class="empty-state">
+            <div class="empty-state-icon">
+             💳
+            </div>
+            <p>No payments recorded</p><button class="btn btn-primary" onclick="document.getElementById('addPaymentBtn').click()">Record Your First Payment</button>
+           </div></td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Expenses Page -->
+    <div id="expensesPage" class="page" style="display: none;">
+     <div class="header">
+      <h2>Expenses</h2><button class="btn btn-primary" id="addExpenseBtn">+ Add Expense</button>
+     </div>
+     <div class="content-card">
+      <h3 style="margin-bottom: 10px; color: #e2e8f0; font-size: 18px;">Expense Categories</h3>
+      <div class="chart-container">
+       <canvas id="expenseChart"></canvas>
+      </div>
+     </div>
+     <div class="content-card">
+      <div class="search-box"><input type="text" id="expenseSearch" placeholder="🔍 Search expenses...">
+      </div>
+      <div class="loading" id="expensesLoading">
+       Loading expenses...
+      </div>
+      <div class="table-container">
+       <table>
+        <thead>
+         <tr>
+          <th>Category</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Notes</th>
+          <th>Actions</th>
+         </tr>
+        </thead>
+        <tbody id="expensesTable">
+         <tr>
+          <td colspan="5">
+           <div class="empty-state">
+            <div class="empty-state-icon">
+             💸
+            </div>
+            <p>No expenses recorded</p><button class="btn btn-primary" onclick="document.getElementById('addExpenseBtn').click()">Add Your First Expense</button>
+           </div></td>
+         </tr>
+        </tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Reports Page -->
+    <div id="reportsPage" class="page" style="display: none;">
+     <div class="header">
+      <h2>Financial Reports</h2>
+     </div>
+     <div class="content-card">
+      <h3 style="margin-bottom: 20px; color: #e2e8f0; font-size: 18px;">Monthly Report</h3>
+      <div class="form-group"><label for="reportMonth">Select Month</label> <input type="month" id="reportMonth" class="form-control">
+      </div><button class="btn btn-primary" id="generateReportBtn">Generate Report</button>
+      <div id="reportContent" style="margin-top: 30px; display: none;">
+       <div class="stats-grid">
+        <div class="stat-card income">
+         <div class="stat-label">
+          Income
+         </div>
+         <div class="stat-value" id="reportIncome">
+          $0
+         </div>
+        </div>
+        <div class="stat-card expense">
+         <div class="stat-label">
+          Expenses
+         </div>
+         <div class="stat-value" id="reportExpenses">
+          $0
+         </div>
+        </div>
+        <div class="stat-card profit">
+         <div class="stat-label">
+          Profit
+         </div>
+         <div class="stat-value" id="reportProfit">
+          $0
+         </div>
+        </div>
+       </div>
+       <div style="margin-top: 30px;">
+        <h4 style="color: #e2e8f0; margin-bottom: 15px;">Payment Breakdown</h4>
+        <div id="reportDetails"></div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div><!-- Add/Edit Client Modal -->
+  <div id="clientModal" class="modal">
+   <div class="modal-content">
+    <div class="modal-header">
+     <h3 id="clientModalTitle">Add Client</h3><button class="close-btn" onclick="closeModal('clientModal')">×</button>
+    </div>
+    <form id="clientForm" onsubmit="event.preventDefault(); saveClient();">
+     <div class="form-group"><label for="clientName">Client Name *</label> <input type="text" id="clientName" required>
+     </div>
+     <div class="form-group"><label for="clientEmail">Email</label> <input type="email" id="clientEmail">
+     </div>
+     <div class="form-group"><label for="clientPhone">Phone</label> <input type="tel" id="clientPhone">
+     </div>
+     <div class="form-group"><label for="clientService">Service Details</label> <textarea id="clientService" rows="3"></textarea>
+     </div>
+     <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('clientModal')">Cancel</button> <button type="submit" class="btn btn-primary" id="saveClientBtn"> <span class="btn-text">Save Client</span> </button>
+     </div>
+    </form>
+   </div>
+  </div><!-- Add/Edit Payment Modal -->
+  <div id="paymentModal" class="modal">
+   <div class="modal-content">
+    <div class="modal-header">
+     <h3 id="paymentModalTitle">Add Payment</h3><button class="close-btn" onclick="closeModal('paymentModal')">×</button>
+    </div>
+    <form id="paymentForm" onsubmit="event.preventDefault(); savePayment();">
+     <div class="form-group"><label for="paymentClient">Client *</label> <select id="paymentClient" required> <option value="">Select a client</option> </select>
+     </div>
+     <div class="form-group"><label for="paymentAmount">Amount *</label> <input type="number" id="paymentAmount" step="0.01" required>
+     </div>
+     <div class="form-group"><label for="paymentDate">Date *</label> <input type="date" id="paymentDate" required>
+     </div>
+     <div class="form-group"><label for="paymentMode">Payment Mode *</label> <select id="paymentMode" required> <option value="UPI">UPI</option> <option value="Cash">Cash</option> <option value="Bank Transfer">Bank Transfer</option> <option value="Check">Check</option> <option value="Card">Card</option> </select>
+     </div>
+     <div class="form-group"><label for="paymentStatus">Status *</label> <select id="paymentStatus" required> <option value="Paid">Paid</option> <option value="Pending">Pending</option> </select>
+     </div>
+     <div class="form-group"><label for="paymentNotes">Notes</label> <textarea id="paymentNotes" rows="3"></textarea>
+     </div>
+     <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('paymentModal')">Cancel</button> <button type="submit" class="btn btn-primary" id="savePaymentBtn"> <span class="btn-text">Save Payment</span> </button>
+     </div>
+    </form>
+   </div>
+  </div><!-- Add/Edit Expense Modal -->
+  <div id="expenseModal" class="modal">
+   <div class="modal-content">
+    <div class="modal-header">
+     <h3 id="expenseModalTitle">Add Expense</h3><button class="close-btn" onclick="closeModal('expenseModal')">×</button>
+    </div>
+    <form id="expenseForm" onsubmit="event.preventDefault(); saveExpense();">
+     <div class="form-group"><label for="expenseCategory">Category *</label> <select id="expenseCategory" required> <option value="Travel">Travel</option> <option value="Food">Food</option> <option value="Software">Software</option> <option value="Equipment">Equipment</option> <option value="Marketing">Marketing</option> <option value="Utilities">Utilities</option> <option value="Office">Office Supplies</option> <option value="Other">Other</option> </select>
+     </div>
+     <div class="form-group"><label for="expenseAmount">Amount *</label> <input type="number" id="expenseAmount" step="0.01" required>
+     </div>
+     <div class="form-group"><label for="expenseDate">Date *</label> <input type="date" id="expenseDate" required>
+     </div>
+     <div class="form-group"><label for="expenseNotes">Notes</label> <textarea id="expenseNotes" rows="3"></textarea>
+     </div>
+     <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('expenseModal')">Cancel</button> <button type="submit" class="btn btn-primary" id="saveExpenseBtn"> <span class="btn-text">Save Expense</span> </button>
+     </div>
+    </form>
+   </div>
+  </div>
+  <script>
+    // Global state
+    let allData = [];
+    let currentEditingItem = null;
+    let incomeChart = null;
+    let expenseChart = null;
+    let currencySymbol = '$';
+
+    // Default config
+    const defaultConfig = {
+      app_title: 'Finance Manager',
+      currency_symbol: '₹'
+    };
+
+    // Local persistence layer (no external backend needed)
+    const API_BASE = '/api';
+
+    async function apiRequest(path, options = {}) {
+      const response = await fetch(`${API_BASE}${path}`, {
+        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+        ...options
+      });
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || 'Request failed');
+      }
+      if (response.status === 204) return null;
+      return response.json();
+    }
+
+    if (!window.dataSdk) {
+      const localDataSdk = {
+        handler: null,
+        cache: [],
+        async init(handler) {
+          this.handler = handler;
+          await this.refresh();
+          return { isOk: true };
+        },
+        async refresh() {
+          this.cache = await apiRequest('/records');
+          if (this.handler) {
+            this.handler.onDataChanged([...this.cache]);
+          }
+        },
+        async create(record) {
+          await apiRequest('/records', { method: 'POST', body: JSON.stringify(record) });
+          await this.refresh();
+          return { isOk: true };
+        },
+        async update(record) {
+          await apiRequest(`/records/${record.__backendId}`, { method: 'PUT', body: JSON.stringify(record) });
+          await this.refresh();
+          return { isOk: true };
+        },
+        async delete(record) {
+          await apiRequest(`/records/${record.__backendId}`, { method: 'DELETE' });
+          await this.refresh();
+          return { isOk: true };
+        }
+      };
+
+      window.dataSdk = localDataSdk;
+    }
+
+    if (!window.elementSdk) {
+      window.elementSdk = {
+        config: { ...defaultConfig },
+        async init({ defaultConfig: cfg }) {
+          this.config = { ...cfg };
+          return {};
+        }
+      };
+    }
+
+    // Data handler for SDK
+    const dataHandler = {
+      onDataChanged(data) {
+        allData = data;
+        updateUI();
+      }
+    };
+
+    // Initialize SDK
+    (async function initApp() {
+      const initResult = await window.dataSdk.init(dataHandler);
+      if (!initResult.isOk) {
+        console.error('Failed to initialize data SDK');
+      }
+
+      if (window.elementSdk) {
+        await window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            document.getElementById('appTitle').textContent = '💰 ' + (config.app_title || defaultConfig.app_title);
+            currencySymbol = config.currency_symbol || defaultConfig.currency_symbol;
+            updateUI();
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ['app_title', config.app_title || defaultConfig.app_title],
+            ['currency_symbol', config.currency_symbol || defaultConfig.currency_symbol]
+          ])
+        });
+
+        if (window.elementSdk.config) {
+          currencySymbol = window.elementSdk.config.currency_symbol || defaultConfig.currency_symbol;
+        }
+      }
+
+      // Set default date to today
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('paymentDate').value = today;
+      document.getElementById('expenseDate').value = today;
+
+      // Set report month to current month
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      document.getElementById('reportMonth').value = currentMonth;
+    })();
+
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const page = item.dataset.page;
+        
+        // Update active nav
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+        
+        // Show selected page
+        document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+        document.getElementById(page + 'Page').style.display = 'block';
+      });
+    });
+
+    // Modal functions
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+      currentEditingItem = null;
+    }
+
+    // Client functions
+    document.getElementById('addClientBtn').addEventListener('click', () => {
+      currentEditingItem = null;
+      document.getElementById('clientModalTitle').textContent = 'Add Client';
+      document.getElementById('clientForm').reset();
+      openModal('clientModal');
+    });
+
+    async function saveClient() {
+      const clientData = allData.filter(d => d.type === 'client');
+      if (!currentEditingItem && clientData.length >= 999) {
+        showInlineMessage('Maximum limit of 999 clients reached. Please delete some clients first.');
+        return;
+      }
+
+      const saveBtn = document.getElementById('saveClientBtn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="btn-text">Saving...</span>';
+
+      const client = {
+        id: currentEditingItem ? currentEditingItem.id : 'client_' + Date.now(),
+        type: 'client',
+        clientName: document.getElementById('clientName').value,
+        clientEmail: document.getElementById('clientEmail').value,
+        clientPhone: document.getElementById('clientPhone').value,
+        serviceDetails: document.getElementById('clientService').value,
+        createdAt: currentEditingItem ? currentEditingItem.createdAt : new Date().toISOString(),
+        amount: 0,
+        paymentDate: '',
+        paymentMode: '',
+        status: '',
+        category: '',
+        notes: ''
+      };
+
+      let result;
+      if (currentEditingItem) {
+        const existingRecord = allData.find(d => d.__backendId === currentEditingItem.__backendId);
+        result = await window.dataSdk.update({ ...existingRecord, ...client });
+      } else {
+        result = await window.dataSdk.create(client);
+      }
+
+      if (result.isOk) {
+        closeModal('clientModal');
+        document.getElementById('clientForm').reset();
+      } else {
+        showInlineMessage('Failed to save client. Please try again.');
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<span class="btn-text">Save Client</span>';
+    }
+
+    function editClient(backendId) {
+      const client = allData.find(d => d.__backendId === backendId);
+      if (!client) return;
+
+      currentEditingItem = client;
+      document.getElementById('clientModalTitle').textContent = 'Edit Client';
+      document.getElementById('clientName').value = client.clientName;
+      document.getElementById('clientEmail').value = client.clientEmail || '';
+      document.getElementById('clientPhone').value = client.clientPhone || '';
+      document.getElementById('clientService').value = client.serviceDetails || '';
+      openModal('clientModal');
+    }
+
+    async function deleteClient(backendId) {
+      const client = allData.find(d => d.__backendId === backendId);
+      if (!client) return;
+
+      const deleteBtn = event.target;
+      const originalText = deleteBtn.textContent;
+      deleteBtn.textContent = 'Deleting...';
+      deleteBtn.disabled = true;
+
+      const result = await window.dataSdk.delete(client);
+      
+      if (!result.isOk) {
+        showInlineMessage('Failed to delete client. Please try again.');
+        deleteBtn.textContent = originalText;
+        deleteBtn.disabled = false;
+      }
+    }
+
+    // Payment functions
+    document.getElementById('addPaymentBtn').addEventListener('click', () => {
+      currentEditingItem = null;
+      document.getElementById('paymentModalTitle').textContent = 'Add Payment';
+      document.getElementById('paymentForm').reset();
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('paymentDate').value = today;
+      populateClientDropdown();
+      openModal('paymentModal');
+    });
+
+    function populateClientDropdown() {
+      const select = document.getElementById('paymentClient');
+      const clients = allData.filter(d => d.type === 'client');
+      
+      select.innerHTML = '<option value="">Select a client</option>';
+      clients.forEach(client => {
+        const option = document.createElement('option');
+        option.value = client.clientName;
+        option.textContent = client.clientName;
+        select.appendChild(option);
+      });
+    }
+
+    async function savePayment() {
+      const paymentData = allData.filter(d => d.type === 'payment');
+      if (!currentEditingItem && paymentData.length >= 999) {
+        showInlineMessage('Maximum limit of 999 payments reached. Please delete some payments first.');
+        return;
+      }
+
+      const saveBtn = document.getElementById('savePaymentBtn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="btn-text">Saving...</span>';
+
+      const payment = {
+        id: currentEditingItem ? currentEditingItem.id : 'payment_' + Date.now(),
+        type: 'payment',
+        clientName: document.getElementById('paymentClient').value,
+        amount: parseFloat(document.getElementById('paymentAmount').value),
+        paymentDate: document.getElementById('paymentDate').value,
+        paymentMode: document.getElementById('paymentMode').value,
+        status: document.getElementById('paymentStatus').value,
+        notes: document.getElementById('paymentNotes').value,
+        createdAt: currentEditingItem ? currentEditingItem.createdAt : new Date().toISOString(),
+        clientEmail: '',
+        clientPhone: '',
+        serviceDetails: '',
+        category: ''
+      };
+
+      let result;
+      if (currentEditingItem) {
+        const existingRecord = allData.find(d => d.__backendId === currentEditingItem.__backendId);
+        result = await window.dataSdk.update({ ...existingRecord, ...payment });
+      } else {
+        result = await window.dataSdk.create(payment);
+      }
+
+      if (result.isOk) {
+        closeModal('paymentModal');
+        document.getElementById('paymentForm').reset();
+      } else {
+        showInlineMessage('Failed to save payment. Please try again.');
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<span class="btn-text">Save Payment</span>';
+    }
+
+    function editPayment(backendId) {
+      const payment = allData.find(d => d.__backendId === backendId);
+      if (!payment) return;
+
+      currentEditingItem = payment;
+      document.getElementById('paymentModalTitle').textContent = 'Edit Payment';
+      populateClientDropdown();
+      document.getElementById('paymentClient').value = payment.clientName;
+      document.getElementById('paymentAmount').value = payment.amount;
+      document.getElementById('paymentDate').value = payment.paymentDate;
+      document.getElementById('paymentMode').value = payment.paymentMode;
+      document.getElementById('paymentStatus').value = payment.status;
+      document.getElementById('paymentNotes').value = payment.notes || '';
+      openModal('paymentModal');
+    }
+
+    async function deletePayment(backendId) {
+      const payment = allData.find(d => d.__backendId === backendId);
+      if (!payment) return;
+
+      const deleteBtn = event.target;
+      const originalText = deleteBtn.textContent;
+      deleteBtn.textContent = 'Deleting...';
+      deleteBtn.disabled = true;
+
+      const result = await window.dataSdk.delete(payment);
+      
+      if (!result.isOk) {
+        showInlineMessage('Failed to delete payment. Please try again.');
+        deleteBtn.textContent = originalText;
+        deleteBtn.disabled = false;
+      }
+    }
+
+    // Expense functions
+    document.getElementById('addExpenseBtn').addEventListener('click', () => {
+      currentEditingItem = null;
+      document.getElementById('expenseModalTitle').textContent = 'Add Expense';
+      document.getElementById('expenseForm').reset();
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('expenseDate').value = today;
+      openModal('expenseModal');
+    });
+
+    async function saveExpense() {
+      const expenseData = allData.filter(d => d.type === 'expense');
+      if (!currentEditingItem && expenseData.length >= 999) {
+        showInlineMessage('Maximum limit of 999 expenses reached. Please delete some expenses first.');
+        return;
+      }
+
+      const saveBtn = document.getElementById('saveExpenseBtn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="btn-text">Saving...</span>';
+
+      const expense = {
+        id: currentEditingItem ? currentEditingItem.id : 'expense_' + Date.now(),
+        type: 'expense',
+        category: document.getElementById('expenseCategory').value,
+        amount: parseFloat(document.getElementById('expenseAmount').value),
+        paymentDate: document.getElementById('expenseDate').value,
+        notes: document.getElementById('expenseNotes').value,
+        createdAt: currentEditingItem ? currentEditingItem.createdAt : new Date().toISOString(),
+        clientName: '',
+        clientEmail: '',
+        clientPhone: '',
+        serviceDetails: '',
+        paymentMode: '',
+        status: ''
+      };
+
+      let result;
+      if (currentEditingItem) {
+        const existingRecord = allData.find(d => d.__backendId === currentEditingItem.__backendId);
+        result = await window.dataSdk.update({ ...existingRecord, ...expense });
+      } else {
+        result = await window.dataSdk.create(expense);
+      }
+
+      if (result.isOk) {
+        closeModal('expenseModal');
+        document.getElementById('expenseForm').reset();
+      } else {
+        showInlineMessage('Failed to save expense. Please try again.');
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<span class="btn-text">Save Expense</span>';
+    }
+
+    function editExpense(backendId) {
+      const expense = allData.find(d => d.__backendId === backendId);
+      if (!expense) return;
+
+      currentEditingItem = expense;
+      document.getElementById('expenseModalTitle').textContent = 'Edit Expense';
+      document.getElementById('expenseCategory').value = expense.category;
+      document.getElementById('expenseAmount').value = expense.amount;
+      document.getElementById('expenseDate').value = expense.paymentDate;
+      document.getElementById('expenseNotes').value = expense.notes || '';
+      openModal('expenseModal');
+    }
+
+    async function deleteExpense(backendId) {
+      const expense = allData.find(d => d.__backendId === backendId);
+      if (!expense) return;
+
+      const deleteBtn = event.target;
+      const originalText = deleteBtn.textContent;
+      deleteBtn.textContent = 'Deleting...';
+      deleteBtn.disabled = true;
+
+      const result = await window.dataSdk.delete(expense);
+      
+      if (!result.isOk) {
+        showInlineMessage('Failed to delete expense. Please try again.');
+        deleteBtn.textContent = originalText;
+        deleteBtn.disabled = false;
+      }
+    }
+
+    // Search functionality
+    document.getElementById('clientSearch').addEventListener('input', (e) => {
+      const search = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('#clientsTable tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(search) ? '' : 'none';
+      });
+    });
+
+    document.getElementById('paymentSearch').addEventListener('input', (e) => {
+      const search = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('#paymentsTable tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(search) ? '' : 'none';
+      });
+    });
+
+    document.getElementById('expenseSearch').addEventListener('input', (e) => {
+      const search = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('#expensesTable tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(search) ? '' : 'none';
+      });
+    });
+
+    // Report generation
+    document.getElementById('generateReportBtn').addEventListener('click', () => {
+      const selectedMonth = document.getElementById('reportMonth').value;
+      if (!selectedMonth) return;
+
+      const [year, month] = selectedMonth.split('-');
+      const payments = allData.filter(d => {
+        if (d.type !== 'payment') return false;
+        const date = new Date(d.paymentDate);
+        return date.getFullYear() == year && (date.getMonth() + 1) == month;
+      });
+
+      const expenses = allData.filter(d => {
+        if (d.type !== 'expense') return false;
+        const date = new Date(d.paymentDate);
+        return date.getFullYear() == year && (date.getMonth() + 1) == month;
+      });
+
+      const totalIncome = payments.filter(p => p.status === 'Paid').reduce((sum, p) => sum + p.amount, 0);
+      const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+      const profit = totalIncome - totalExpenses;
+
+      document.getElementById('reportIncome').textContent = currencySymbol + totalIncome.toFixed(2);
+      document.getElementById('reportExpenses').textContent = currencySymbol + totalExpenses.toFixed(2);
+      document.getElementById('reportProfit').textContent = currencySymbol + profit.toFixed(2);
+
+      let detailsHTML = '<table style="width: 100%; border-collapse: collapse;">';
+      detailsHTML += '<thead><tr><th style="text-align: left; padding: 10px; background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8;">Client</th>';
+      detailsHTML += '<th style="text-align: left; padding: 10px; background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8;">Amount</th>';
+      detailsHTML += '<th style="text-align: left; padding: 10px; background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8;">Date</th></tr></thead><tbody>';
+
+      payments.forEach(p => {
+        detailsHTML += `<tr><td style="padding: 10px; border-bottom: 1px solid #334155; color: #cbd5e1;">${p.clientName}</td>`;
+        detailsHTML += `<td style="padding: 10px; border-bottom: 1px solid #334155; color: #cbd5e1;">${currencySymbol}${p.amount.toFixed(2)}</td>`;
+        detailsHTML += `<td style="padding: 10px; border-bottom: 1px solid #334155; color: #cbd5e1;">${p.paymentDate}</td></tr>`;
+      });
+
+      detailsHTML += '</tbody></table>';
+      document.getElementById('reportDetails').innerHTML = detailsHTML;
+      document.getElementById('reportContent').style.display = 'block';
+    });
+
+    // Update UI
+    function updateUI() {
+      updateDashboard();
+      updateClientsTable();
+      updatePaymentsTable();
+      updateExpensesTable();
+    }
+
+    function updateDashboard() {
+      const clients = allData.filter(d => d.type === 'client');
+      const payments = allData.filter(d => d.type === 'payment');
+      const expenses = allData.filter(d => d.type === 'expense');
+
+      const totalIncome = payments.filter(p => p.status === 'Paid').reduce((sum, p) => sum + p.amount, 0);
+      const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+      const netProfit = totalIncome - totalExpenses;
+
+      document.getElementById('totalIncome').textContent = currencySymbol + totalIncome.toFixed(2);
+      document.getElementById('totalExpenses').textContent = currencySymbol + totalExpenses.toFixed(2);
+      document.getElementById('netProfit').textContent = currencySymbol + netProfit.toFixed(2);
+      document.getElementById('totalClients').textContent = clients.length;
+
+      // Recent payments
+      const recentPayments = payments.slice(-5).reverse();
+      const recentTable = document.getElementById('recentPaymentsTable');
+      
+      if (recentPayments.length === 0) {
+        recentTable.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #64748b; padding: 40px;">No payments yet</td></tr>';
+      } else {
+        recentTable.innerHTML = recentPayments.map(p => `
+          <tr>
+            <td>${p.clientName}</td>
+            <td>${currencySymbol}${p.amount.toFixed(2)}</td>
+            <td>${p.paymentDate}</td>
+            <td><span class="badge ${p.status.toLowerCase()}">${p.status}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      // Update charts
+      updateIncomeChart(payments);
+      updateExpenseChart(expenses);
+    }
+
+    function updateIncomeChart(payments) {
+      const ctx = document.getElementById('incomeChart');
+      if (!ctx) return;
+
+      // Get last 6 months data
+      const monthlyData = {};
+      const months = [];
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const key = date.toISOString().slice(0, 7);
+        monthlyData[key] = 0;
+        months.push(date.toLocaleDateString('default', { month: 'short' }));
+      }
+
+      payments.forEach(p => {
+        if (p.status === 'Paid') {
+          const monthKey = p.paymentDate.slice(0, 7);
+          if (monthlyData.hasOwnProperty(monthKey)) {
+            monthlyData[monthKey] += p.amount;
+          }
+        }
+      });
+
+      const data = Object.values(monthlyData);
+
+      if (incomeChart) {
+        incomeChart.destroy();
+      }
+
+      incomeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Income',
+            data: data,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return currencySymbol + value;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateExpenseChart(expenses) {
+      const ctx = document.getElementById('expenseChart');
+      if (!ctx) return;
+
+      const categoryData = {};
+      expenses.forEach(e => {
+        categoryData[e.category] = (categoryData[e.category] || 0) + e.amount;
+      });
+
+      const labels = Object.keys(categoryData);
+      const data = Object.values(categoryData);
+
+      if (expenseChart) {
+        expenseChart.destroy();
+      }
+
+      if (labels.length === 0) {
+        ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+        return;
+      }
+
+      expenseChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: [
+              '#7c3aed',
+              '#10b981',
+              '#a78bfa',
+              '#34d399',
+              '#8b5cf6',
+              '#6ee7b7',
+              '#c084fc',
+              '#059669'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      });
+    }
+
+    function updateClientsTable() {
+      const clients = allData.filter(d => d.type === 'client');
+      const table = document.getElementById('clientsTable');
+
+      if (clients.length === 0) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-state-icon">👥</div>
+                <p>No clients yet</p>
+                <button class="btn btn-primary" onclick="document.getElementById('addClientBtn').click()">Add Your First Client</button>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      table.innerHTML = clients.map(c => `
+        <tr>
+          <td>${c.clientName}</td>
+          <td>${c.clientEmail || '-'}</td>
+          <td>${c.clientPhone || '-'}</td>
+          <td>${c.serviceDetails || '-'}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="icon-btn edit" onclick="editClient('${c.__backendId}')">✏️ Edit</button>
+              <button class="icon-btn delete" onclick="deleteClient('${c.__backendId}')">🗑️ Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updatePaymentsTable() {
+      const payments = allData.filter(d => d.type === 'payment');
+      const table = document.getElementById('paymentsTable');
+
+      if (payments.length === 0) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-state-icon">💳</div>
+                <p>No payments recorded</p>
+                <button class="btn btn-primary" onclick="document.getElementById('addPaymentBtn').click()">Record Your First Payment</button>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      table.innerHTML = payments.map(p => `
+        <tr>
+          <td>${p.clientName}</td>
+          <td>${currencySymbol}${p.amount.toFixed(2)}</td>
+          <td>${p.paymentDate}</td>
+          <td>${p.paymentMode}</td>
+          <td><span class="badge ${p.status.toLowerCase()}">${p.status}</span></td>
+          <td>
+            <div class="action-buttons">
+              <button class="icon-btn edit" onclick="editPayment('${p.__backendId}')">✏️ Edit</button>
+              <button class="icon-btn delete" onclick="deletePayment('${p.__backendId}')">🗑️ Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateExpensesTable() {
+      const expenses = allData.filter(d => d.type === 'expense');
+      const table = document.getElementById('expensesTable');
+
+      if (expenses.length === 0) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <div class="empty-state-icon">💸</div>
+                <p>No expenses recorded</p>
+                <button class="btn btn-primary" onclick="document.getElementById('addExpenseBtn').click()">Add Your First Expense</button>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      table.innerHTML = expenses.map(e => `
+        <tr>
+          <td>${e.category}</td>
+          <td>${currencySymbol}${e.amount.toFixed(2)}</td>
+          <td>${e.paymentDate}</td>
+          <td>${e.notes || '-'}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="icon-btn edit" onclick="editExpense('${e.__backendId}')">✏️ Edit</button>
+              <button class="icon-btn delete" onclick="deleteExpense('${e.__backendId}')">🗑️ Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function showInlineMessage(message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #ef4444; color: white; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; font-weight: 500;';
+      messageDiv.textContent = message;
+      document.body.appendChild(messageDiv);
+      
+      setTimeout(() => {
+        messageDiv.remove();
+      }, 4000);
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a1ed36792deff6e',t:'MTc2MzcxMzgzNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
